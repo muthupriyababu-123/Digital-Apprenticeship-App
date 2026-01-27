@@ -42,7 +42,7 @@ code {
 
 /* Card Styles */
 .card {
-  @apply bg-white rounded-lg shadow-md p-6 transition-transform duration-300 hover:shadow-lg hover:scale-105;
+  @apply bg-white rounded-xl shadow-md p-6 transition-all duration-300 hover:shadow-lg hover:scale-[1.02];
 }
 
 .dark .card {
@@ -51,11 +51,11 @@ code {
 
 /* Button Styles */
 .btn {
-  @apply px-4 py-2 rounded-lg font-semibold transition-all duration-300 cursor-pointer;
+  @apply px-4 py-2 rounded-lg font-semibold transition-all duration-300 cursor-pointer inline-flex items-center justify-center;
 }
 
 .btn-primary {
-  @apply bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:shadow-lg;
+  @apply bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:shadow-lg active:scale-95;
 }
 
 .btn-secondary {
@@ -66,9 +66,9 @@ code {
   @apply bg-gray-700 text-white hover:bg-gray-600;
 }
 
-/* Badge Styles */npx tailwindcss init -p
+/* Badge Styles */
 .badge {
-  @apply inline-block px-3 py-1 rounded-full text-sm font-semibold;
+  @apply inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider;
 }
 
 .badge-primary {
@@ -83,6 +83,10 @@ code {
   @apply bg-yellow-100 text-yellow-800;
 }
 
+.badge-purple {
+  @apply bg-purple-100 text-purple-800;
+}
+
 /* Progress Bar */
 .progress-bar {
   @apply h-2 bg-gray-200 rounded-full overflow-hidden;
@@ -90,6 +94,19 @@ code {
 
 .progress-bar-fill {
   @apply h-full bg-gradient-to-r from-blue-500 to-purple-600 transition-all duration-500;
+}
+
+/* --- Added Task Flow Specific Styles --- */
+
+/* Code Editor Custom Styling */
+.code-editor-textarea {
+  @apply w-full h-full p-6 bg-gray-900 text-green-400 font-mono text-lg outline-none resize-none;
+  caret-color: white;
+}
+
+/* Today's Task Special Card */
+.task-card-today {
+  @apply border-l-8 border-purple-600 bg-white shadow-lg p-6 rounded-xl cursor-pointer transition-all hover:translate-x-1;
 }
 
 /* Animations */
@@ -102,4 +119,15 @@ code {
 .gradient-animate {
   background-size: 200% 200%;
   animation: gradient 15s ease infinite;
+}
+
+/* Scale up for the success checkmark */
+@keyframes popIn {
+  0% { transform: scale(0); }
+  70% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+.animate-pop {
+  animation: popIn 0.5s cubic-bezier(0.26, 0.53, 0.74, 1.48);
 }

@@ -1,13 +1,11 @@
 import axios from 'axios';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
-
-const api = axios.create({
-  baseURL: API_BASE_URL,
+const API = axios.create({
+  baseURL: 'http://localhost:5000/api',
 });
 
-// Add token to requests
-api.interceptors.request.use((config) => {
+// Add token to requests if it exists
+API.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
@@ -15,40 +13,33 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Handle response errors
-api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      localStorage.removeItem('token');
-      window.location.href = '/login';
-    }
-    return Promise.reject(error);
-  }
-);
-
-// Auth APIs
+// Auth API
 export const authAPI = {
-  register: (data) => api.post('/auth/register', data),
-  login: (data) => api.post('/auth/login', data),
-  getCurrentUser: () => api.get('/auth/me'),
+  login: (credentials) => API.post('/auth/login', credentials),
+  register: (userData) => API.post('/auth/register', userData),
+  logout: () => API.post('/auth/logout'),
+  getCurrentUser: () => API.get('/auth/me'),
 };
 
-// User APIs
+// User API
 export const userAPI = {
-  getProfile: (id) => api.get(`/users/${id}`),
-  updateProfile: (id, data) => api.put(`/users/${id}`, data),
-  getAllUsers: (params) => api.get('/users', { params }),
+  getProfile: () => API.get('/users/profile'),
+  updateProfile: (data) => API.put('/users/profile', data),
+  getStudents: () => API.get('/users/students'),
+  getUser: (id) => API.get(`/users/${id}`),
 };
 
-// Task APIs
+// Task API
 export const taskAPI = {
-  getAllTasks: (params) => api.get('/tasks', { params }),
-  getTaskById: (id) => api.get(`/tasks/${id}`),
-  createTask: (data) => api.post('/tasks', data),
-  updateTask: (id, data) => api.put(`/tasks/${id}`, data),
-  deleteTask: (id) => api.delete(`/tasks/${id}`),
-  submitTask: (taskId, data) => api.post(`/tasks/${taskId}/submit`, data),
+  getTasks: () => API.get('/tasks'),
+  getTask: (id) => API.get(`/tasks/${id}`),
+  createTask: (taskData) => API.post('/tasks', taskData),
+  updateTask: (id, taskData) => API.put(`/tasks/${id}`, taskData),
+  deleteTask: (id) => API.delete(`/tasks/${id}`),
+  submitTask: (id, submissionData) => API.post(`/tasks/${id}/submit`, submissionData),
 };
 
-export default api;
+// Keep backward compatibility
+export const registerUser = (data) => API.post('/auth/register', data);
+
+export default API;

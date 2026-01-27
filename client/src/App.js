@@ -13,8 +13,14 @@ function App() {
   const { user, token, login, logout, isAuthenticated } = useAuth();
   const [currentUser, setCurrentUser] = useState(user);
 
+  // Sync currentUser with useAuth user state (e.g., after page refresh)
+  useEffect(() => {
+    setCurrentUser(user);
+  }, [user]);
+
   const handleLoginSuccess = (userData) => {
     setCurrentUser(userData);
+    // Note: Assuming token is handled inside your useAuth login method
     login(userData, localStorage.getItem('token'));
   };
 
@@ -26,22 +32,37 @@ function App() {
   return (
     <Router>
       <Navbar user={currentUser} onLogout={handleLogout} />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/tasks" element={<TaskList />} />
-        <Route
-          path="/login"
-          element={isAuthenticated ? <Navigate to="/dashboard" /> : <Login onLoginSuccess={handleLoginSuccess} />}
-        />
-        <Route
-          path="/register"
-          element={isAuthenticated ? <Navigate to="/dashboard" /> : <Register onRegisterSuccess={handleLoginSuccess} />}
-        />
-        <Route
-          path="/dashboard"
-          element={isAuthenticated ? <StudentDashboard user={currentUser} /> : <Navigate to="/login" />}
-        />
-      </Routes>
+      <div className="pt-16"> {/* Added padding top to prevent content being hidden under Navbar */}
+        <Routes>
+          {/* Public Route */}
+          <Route path="/" element={<Home />} />
+
+          {/* Protected Task Route - Added auth check */}
+          <Route 
+            path="/tasks" 
+            element={isAuthenticated ? <TaskList /> : <Navigate to="/login" />} 
+          />
+
+          {/* Protected Dashboard Route */}
+          <Route
+            path="/dashboard"
+            element={isAuthenticated ? <StudentDashboard user={currentUser} /> : <Navigate to="/login" />}
+          />
+
+          {/* Auth Routes */}
+          <Route
+            path="/login"
+            element={isAuthenticated ? <Navigate to="/dashboard" /> : <Login onLoginSuccess={handleLoginSuccess} />}
+          />
+          <Route
+            path="/register"
+            element={isAuthenticated ? <Navigate to="/dashboard" /> : <Register onRegisterSuccess={handleLoginSuccess} />}
+          />
+
+          {/* Fallback Catch-all */}
+          <Route path="*" element={<Navigate to="/" />} />
+        </Routes>
+      </div>
     </Router>
   );
 }

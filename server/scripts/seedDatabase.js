@@ -1,233 +1,175 @@
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
-const bcrypt = require('bcryptjs');
 
 dotenv.config();
 
+// Import Models
 const User = require('../models/User');
 const Task = require('../models/Task');
 const StudentProfile = require('../models/StudentProfile');
 const Company = require('../models/Company');
 
+/* -------------------- SEED DATABASE -------------------- */
 const seedDatabase = async () => {
   try {
     // Connect to MongoDB
-    await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/digital-apprenticeship');
+    await mongoose.connect(process.env.MONGODB_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+
     console.log('✓ Connected to MongoDB');
 
-    // Clear existing data
+    /* -------------------- CLEAR OLD DATA -------------------- */
     await User.deleteMany({});
     await Task.deleteMany({});
     await StudentProfile.deleteMany({});
     await Company.deleteMany({});
+
     console.log('✓ Cleared existing data');
 
-    // Create sample users
-    const students = await User.insertMany([
-      {
-        firstName: 'Rahul',
-        lastName: 'Kumar',
-        email: 'rahul@example.com',
-        password: 'password123',
-        role: 'student',
-        skills: ['JavaScript', 'React', 'Node.js'],
-        interests: ['Web Development', 'Full Stack'],
-      },
-      {
-        firstName: 'Priya',
-        lastName: 'Singh',
-        email: 'priya@example.com',
-        password: 'password123',
-        role: 'student',
-        skills: ['Python', 'Data Science', 'ML'],
-        interests: ['Machine Learning', 'Data Analysis'],
-      },
-      {
-        firstName: 'Amit',
-        lastName: 'Patel',
-        email: 'amit@example.com',
-        password: 'password123',
-        role: 'student',
-        skills: ['UI/UX Design', 'Figma', 'CSS'],
-        interests: ['Design', 'Frontend'],
-      },
-    ]);
+    /* -------------------- CREATE USERS -------------------- */
+    // Create students
+    const student1 = new User({
+      firstName: 'Rahul',
+      lastName: 'Kumar',
+      email: 'rahul@example.com',
+      password: 'password123',
+      role: 'student',
+      skills: ['JavaScript', 'React', 'Node.js'],
+      interests: ['Web Development', 'Full Stack'],
+    });
+    await student1.save();
 
-    const companies = await User.insertMany([
-      {
-        firstName: 'Tech',
-        lastName: 'Corp',
-        email: 'techcorp@example.com',
-        password: 'password123',
-        role: 'company',
-      },
-      {
-        firstName: 'Data',
-        lastName: 'Systems',
-        email: 'datasys@example.com',
-        password: 'password123',
-        role: 'company',
-      },
-    ]);
+    const student2 = new User({
+      firstName: 'Priya',
+      lastName: 'Singh',
+      email: 'priya@example.com',
+      password: 'password123',
+      role: 'student',
+      skills: ['Python', 'Data Science', 'ML'],
+      interests: ['Machine Learning', 'Data Analysis'],
+    });
+    await student2.save();
 
-    const educators = await User.insertMany([
-      {
-        firstName: 'Dr',
-        lastName: 'Sharma',
-        email: 'sharma@college.com',
-        password: 'password123',
-        role: 'educator',
-      },
-    ]);
+    const student3 = new User({
+      firstName: 'Test',
+      lastName: 'Login',
+      email: 'testlogin123@gmail.com',
+      password: 'Test@1234',
+      role: 'student',
+      skills: ['UI/UX Design', 'Figma', 'CSS'],
+      interests: ['Design', 'Frontend'],
+    });
+    await student3.save();
 
-    console.log('✓ Created sample users');
+    // Create companies
+    const company1 = new User({
+      firstName: 'Sanjanaa',
+      lastName: 'S G',
+      email: 'sanjanaasasi@gmail.com',
+      password: 'sanjanaa@2007#',
+      role: 'company',
+    });
+    await company1.save();
 
-    // Create sample tasks
+    const company2 = new User({
+      firstName: 'Data',
+      lastName: 'Systems',
+      email: 'datasys@example.com',
+      password: 'password123',
+      role: 'company',
+    });
+    await company2.save();
+
+    // Create educators
+    const educator1 = new User({
+      firstName: 'vinu',
+      lastName: 'rithika',
+      email: 'vinu@example.com',
+      password: 'password123',
+      role: 'educator',
+    });
+    await educator1.save();
+
+    const students = [student1, student2, student3];
+    const companies = [company1, company2];
+    const educators = [educator1];
+
+    console.log('✓ Created users');
+
+    /* -------------------- CREATE TASKS -------------------- */
     const tasks = await Task.insertMany([
       {
-        title: 'Build a Todo Application with React',
-        description: 'Create a fully functional todo application with add, edit, delete, and filter functionalities using React hooks.',
+        title: 'Build a Todo App with React',
+        description: 'Create a complete Todo app using React hooks.',
         category: 'web-dev',
         difficulty: 'beginner',
         skills: ['React', 'JavaScript', 'CSS'],
         postedBy: companies[0]._id,
-        deliverables: ['GitHub Repository', 'Deployed Link', 'Code Documentation'],
+        deliverables: ['GitHub Repo', 'Live Demo'],
         estimatedHours: 8,
         xpReward: 150,
         status: 'published',
       },
       {
         title: 'Data Analysis with Pandas',
-        description: 'Analyze a real-world dataset using Python Pandas and create insightful visualizations.',
+        description: 'Analyze datasets using Python and Pandas.',
         category: 'data-science',
         difficulty: 'intermediate',
-        skills: ['Python', 'Pandas', 'Data Analysis', 'Matplotlib'],
+        skills: ['Python', 'Pandas', 'Matplotlib'],
         postedBy: companies[1]._id,
-        deliverables: ['Jupyter Notebook', 'Analysis Report'],
+        deliverables: ['Notebook', 'Report'],
         estimatedHours: 12,
         xpReward: 200,
         status: 'published',
       },
       {
-        title: 'E-commerce Product Page Design',
-        description: 'Design a modern, responsive product page for an e-commerce website with multiple features.',
-        category: 'design',
-        difficulty: 'intermediate',
-        skills: ['UI Design', 'Figma', 'Responsive Design'],
-        postedBy: companies[0]._id,
-        deliverables: ['Figma File', 'Design Specifications', 'Prototype'],
-        estimatedHours: 10,
-        xpReward: 180,
-        status: 'published',
-      },
-      {
-        title: 'Build a REST API with Express',
-        description: 'Create a production-ready REST API with authentication, error handling, and database integration.',
+        title: 'REST API with Express',
+        description: 'Build a secure REST API with JWT authentication.',
         category: 'web-dev',
         difficulty: 'advanced',
         skills: ['Node.js', 'Express', 'MongoDB', 'JWT'],
         postedBy: companies[0]._id,
-        deliverables: ['API Code', 'Documentation', 'Postman Collection'],
+        deliverables: ['API Code', 'Docs'],
         estimatedHours: 15,
         xpReward: 250,
         status: 'published',
       },
-      {
-        title: 'Mobile App UI Development',
-        description: 'Develop the UI for a mobile application using React Native or Flutter.',
-        category: 'mobile-dev',
-        difficulty: 'intermediate',
-        skills: ['React Native', 'Mobile UI', 'JavaScript'],
-        postedBy: companies[0]._id,
-        deliverables: ['GitHub Repo', 'APK/IPA', 'UI Screenshots'],
-        estimatedHours: 14,
-        xpReward: 220,
-        status: 'published',
-      },
-      {
-        title: 'Machine Learning Model Development',
-        description: 'Build and train an ML model for prediction tasks with proper evaluation metrics.',
-        category: 'data-science',
-        difficulty: 'advanced',
-        skills: ['Python', 'scikit-learn', 'TensorFlow', 'Machine Learning'],
-        postedBy: companies[1]._id,
-        deliverables: ['Trained Model', 'Jupyter Notebook', 'Performance Report'],
-        estimatedHours: 20,
-        xpReward: 300,
-        status: 'published',
-      },
-      {
-        title: 'Docker Containerization',
-        description: 'Containerize a full-stack application using Docker and Docker Compose.',
-        category: 'devops',
-        difficulty: 'intermediate',
-        skills: ['Docker', 'DevOps', 'Linux', 'YAML'],
-        postedBy: companies[0]._id,
-        deliverables: ['Dockerfile', 'Docker Compose File', 'Documentation'],
-        estimatedHours: 8,
-        xpReward: 160,
-        status: 'published',
-      },
-      {
-        title: 'Next.js Full-Stack Project',
-        description: 'Build a complete full-stack application using Next.js with API routes and database.',
-        category: 'web-dev',
-        difficulty: 'advanced',
-        skills: ['Next.js', 'React', 'API Routes', 'Database Design'],
-        postedBy: companies[0]._id,
-        deliverables: ['GitHub Repo', 'Live Demo', 'Technical Documentation'],
-        estimatedHours: 25,
-        xpReward: 350,
-        status: 'published',
-      },
     ]);
 
-    console.log('✓ Created sample tasks');
+    console.log('✓ Created tasks');
 
-    // Create student profiles
-    const studentProfiles = await StudentProfile.insertMany([
+    /* -------------------- STUDENT PROFILES -------------------- */
+    await StudentProfile.insertMany([
       {
         user: students[0]._id,
-        totalXP: 1250,
+        totalXP: 1200,
         level: 5,
-        completedTasks: [tasks[0]._id, tasks[2]._id],
-        badges: [
-          { name: 'First Task', icon: '⭐', earnedAt: new Date() },
-          { name: 'Fast Learner', icon: '🚀', earnedAt: new Date() },
-        ],
+        completedTasks: [tasks[0]._id],
+        badges: [{ name: 'First Task', icon: '⭐', earnedAt: new Date() }],
         internshipReadinessScore: 75,
-        skillProgress: [
-          { skill: 'React', proficiency: 'advanced', tasksCompleted: 3 },
-          { skill: 'JavaScript', proficiency: 'advanced', tasksCompleted: 5 },
-          { skill: 'CSS', proficiency: 'intermediate', tasksCompleted: 2 },
-        ],
       },
       {
         user: students[1]._id,
-        totalXP: 980,
+        totalXP: 950,
         level: 4,
         completedTasks: [tasks[1]._id],
-        badges: [
-          { name: 'Data Master', icon: '📊', earnedAt: new Date() },
-        ],
-        internshipReadinessScore: 60,
-        skillProgress: [
-          { skill: 'Python', proficiency: 'advanced', tasksCompleted: 4 },
-          { skill: 'Data Science', proficiency: 'intermediate', tasksCompleted: 2 },
-        ],
+        badges: [{ name: 'Data Master', icon: '📊', earnedAt: new Date() }],
+        internshipReadinessScore: 65,
       },
     ]);
 
     console.log('✓ Created student profiles');
 
-    // Create company profiles
-    const companyProfiles = await Company.insertMany([
+    /* -------------------- COMPANY PROFILES -------------------- */
+    await Company.insertMany([
       {
         user: companies[0]._id,
         companyName: 'TechCorp Solutions',
         industry: 'Software Development',
-        description: 'Leading software development company focusing on web and mobile applications.',
-        postedTasks: [tasks[0]._id, tasks[2]._id, tasks[3]._id, tasks[4]._id],
+        description: 'Web and mobile application development company.',
+        postedTasks: [tasks[0]._id, tasks[2]._id],
         shortlistedStudents: [students[0]._id],
         verificationStatus: 'verified',
       },
@@ -235,8 +177,8 @@ const seedDatabase = async () => {
         user: companies[1]._id,
         companyName: 'DataSystems AI',
         industry: 'AI & Machine Learning',
-        description: 'Specialized in data science, AI, and machine learning solutions.',
-        postedTasks: [tasks[1]._id, tasks[5]._id],
+        description: 'AI-powered data science company.',
+        postedTasks: [tasks[1]._id],
         shortlistedStudents: [students[1]._id],
         verificationStatus: 'verified',
       },
@@ -244,16 +186,18 @@ const seedDatabase = async () => {
 
     console.log('✓ Created company profiles');
 
-    console.log('\n✅ Database seeded successfully!');
-    console.log('\n📝 Sample Credentials:');
-    console.log('Student: rahul@example.com / password123');
-    console.log('Company: techcorp@example.com / password123');
-    console.log('Educator: sharma@college.com / password123');
+    console.log('\n✅ DATABASE SEEDED SUCCESSFULLY');
+    console.log('\n🔐 Sample Login Credentials');
+    console.log('Student  : rahul@example.com / password123');
+    console.log('Student  : priya@example.com / password123');
+    console.log('Student  : testlogin123@gmail.com / Test@1234');
+    console.log('Company  : datasys@example.com / password123');
+    console.log('Educator : vinu@example.com / password123');
 
     await mongoose.connection.close();
-    console.log('\n✓ Database connection closed');
+    console.log('\n✓ MongoDB connection closed');
   } catch (error) {
-    console.error('❌ Error seeding database:', error);
+    console.error('❌ Seeding failed:', error);
     process.exit(1);
   }
 };

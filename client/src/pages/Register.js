@@ -1,111 +1,128 @@
-import React, { useState } from 'react';
-import { authAPI } from '../api';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { registerUser } from '../api';
+import '../styles/Register.css';
 
-const Register = ({ onRegisterSuccess }) => {
-  const [formData, setFormData] = useState({
+const Register = () => {
+  const navigate = useNavigate();
+  const [form, setForm] = useState({
     firstName: '',
     lastName: '',
     email: '',
     password: '',
     role: 'student',
   });
-  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setForm({ ...form, [e.target.name]: e.target.value });
+    setError('');
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
     setLoading(true);
-
+    setError('');
+    
     try {
-      const response = await authAPI.register(formData);
-      const { token, user } = response.data;
-      localStorage.setItem('token', token);
-      onRegisterSuccess(user);
+      await registerUser(form);
+      alert('Registration successful! Please login.');
+      navigate('/login');
     } catch (err) {
-      setError(err.response?.data?.error || 'Registration failed');
+      setError(err.response?.data?.error || err.response?.data?.message || 'Registration failed. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 flex items-center justify-center p-4">
-      <div className="bg-white rounded-xl shadow-2xl p-8 w-full max-w-md animate-slideUp">
-        <h1 className="text-3xl font-bold text-gray-800 mb-2">Join SkillBridge</h1>
-        <p className="text-gray-600 mb-6">Create your account to get started</p>
-
-        {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-4">
-            {error}
+    <div className="register-container">
+      <div className="register-card">
+        <h2>Create Account</h2>
+        <p className="register-subtitle">Join SkillBridge today</p>
+        
+        {error && <div className="error-message">{error}</div>}
+        
+        <form onSubmit={handleSubmit} className="register-form">
+          <div className="form-row">
+            <div className="form-group">
+              <label htmlFor="firstName">First Name</label>
+              <input
+                id="firstName"
+                name="firstName"
+                type="text"
+                placeholder="First Name"
+                value={form.firstName}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            
+            <div className="form-group">
+              <label htmlFor="lastName">Last Name</label>
+              <input
+                id="lastName"
+                name="lastName"
+                type="text"
+                placeholder="Last Name"
+                value={form.lastName}
+                onChange={handleChange}
+                required
+              />
+            </div>
           </div>
-        )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-2 gap-3">
+          <div className="form-group">
+            <label htmlFor="email">Email</label>
             <input
-              type="text"
-              name="firstName"
-              placeholder="First Name"
-              value={formData.firstName}
+              id="email"
+              name="email"
+              type="email"
+              placeholder="Email"
+              value={form.email}
               onChange={handleChange}
-              className="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
               required
             />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="password">Password</label>
             <input
-              type="text"
-              name="lastName"
-              placeholder="Last Name"
-              value={formData.lastName}
+              id="password"
+              name="password"
+              type="password"
+              placeholder="Password"
+              value={form.password}
               onChange={handleChange}
-              className="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
               required
+              minLength="6"
             />
           </div>
-          <input
-            type="email"
-            name="email"
-            placeholder="Email"
-            value={formData.email}
-            onChange={handleChange}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-            required
-          />
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            value={formData.password}
-            onChange={handleChange}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-            required
-          />
-          <select
-            name="role"
-            value={formData.role}
-            onChange={handleChange}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-          >
-            <option value="student">Student</option>
-            <option value="company">Company</option>
-            <option value="educator">Educator</option>
-          </select>
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full btn btn-primary"
-          >
-            {loading ? 'Registering...' : 'Register'}
+
+          <div className="form-group">
+            <label htmlFor="role">I am a</label>
+            <select 
+              id="role"
+              name="role" 
+              value={form.role}
+              onChange={handleChange}
+              required
+            >
+              <option value="student">Student</option>
+              <option value="company">Company</option>
+              <option value="educator">Educator</option>
+            </select>
+          </div>
+
+          <button type="submit" className="register-button" disabled={loading}>
+            {loading ? 'Creating Account...' : 'Register'}
           </button>
-        </form>
 
-        <p className="text-center text-gray-600 mt-4">
-          Already have an account? <a href="/login" className="text-purple-600 font-semibold hover:underline">Login</a>
-        </p>
+          <p className="login-link">
+            Already have an account? <a href="/login">Login here</a>
+          </p>
+        </form>
       </div>
     </div>
   );

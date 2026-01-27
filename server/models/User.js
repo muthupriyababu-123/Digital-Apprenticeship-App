@@ -2,87 +2,28 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
 const userSchema = new mongoose.Schema({
-  firstName: {
-    type: String,
-    required: true,
-  },
-  lastName: {
-    type: String,
-    required: true,
-  },
-  email: {
-    type: String,
-    required: true,
-    unique: true,
-    lowercase: true,
-  },
-  password: {
-    type: String,
-    required: true,
-    minlength: 6,
-  },
+  firstName: { type: String, required: true },
+  lastName: { type: String, required: true },
+  email: { type: String, unique: true, required: true },
+  password: { type: String, required: true },
   role: {
     type: String,
-    enum: ['student', 'company', 'educator', 'counselor', 'admin'],
+    enum: ['student', 'company', 'educator'],
     required: true,
   },
-  profilePicture: {
-    type: String,
-    default: null,
-  },
-  bio: {
-    type: String,
-    default: '',
-  },
-  phone: {
-    type: String,
-    default: '',
-  },
-  location: {
-    type: String,
-    default: '',
-  },
-  website: {
-    type: String,
-    default: '',
-  },
-  socialLinks: {
-    github: String,
-    linkedin: String,
-    portfolio: String,
-  },
-  skills: [{
-    type: String,
-  }],
-  interests: [{
-    type: String,
-  }],
-  education: {
-    institution: String,
-    degree: String,
-    field: String,
-    startYear: Number,
-    endYear: Number,
-  },
-  verified: {
-    type: Boolean,
-    default: false,
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
-  updatedAt: {
-    type: Date,
-    default: Date.now,
-  },
-}, { timestamps: true });
+  profilePicture: { type: String },
+  createdAt: { type: Date, default: Date.now },
+});
 
 // Hash password before saving
-userSchema.pre('save', async function(next) {
-  if (!this.isModified('password')) return next();
-  
+userSchema.pre('save', async function (next) {
+  // Only hash the password if it has been modified (or is new)
+  if (!this.isModified('password')) {
+    return next();
+  }
+
   try {
+    // Generate salt and hash password
     const salt = await bcrypt.genSalt(10);
     this.password = await bcrypt.hash(this.password, salt);
     next();
@@ -91,9 +32,13 @@ userSchema.pre('save', async function(next) {
   }
 });
 
-// Compare password method
-userSchema.methods.comparePassword = async function(enteredPassword) {
-  return await bcrypt.compare(enteredPassword, this.password);
+// Method to compare password for login
+userSchema.methods.comparePassword = async function (candidatePassword) {
+  try {
+    return await bcrypt.compare(candidatePassword, this.password);
+  } catch (error) {
+    throw new Error(error);
+  }
 };
 
 module.exports = mongoose.model('User', userSchema);
