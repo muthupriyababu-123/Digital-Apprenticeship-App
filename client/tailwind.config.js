@@ -1,8 +1,8 @@
 /** @type {import('tailwindcss').Config} */
-export default {
+module.exports = {
   content: [
-    "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
+    "./public/index.html",         // Updated path to public folder
+    "./src/**/*.{js,ts,jsx,tsx}",  // Scans all files in src
   ],
   theme: {
     extend: {

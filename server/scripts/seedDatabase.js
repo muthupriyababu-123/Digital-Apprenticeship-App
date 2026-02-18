@@ -74,11 +74,11 @@ const seedDatabase = async () => {
     await company1.save();
 
     const company2 = new User({
-      firstName: 'Data',
-      lastName: 'Systems',
-      email: 'datasys@example.com',
+      firstName: 'Muthu',
+      lastName: 'Priya',
+      email: 'muthu@example.com',
       password: 'password123',
-      role: 'company',
+      role: 'student',
     });
     await company2.save();
 
