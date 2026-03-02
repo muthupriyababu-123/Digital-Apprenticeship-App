@@ -1,8 +1,7 @@
 const express = require('express');
 const router = express.Router();
+const { submitTask } = require('../controllers/submissionController');
 
-router.get('/', (req, res) => {
-  res.json({ message: 'Submissions endpoint' });
-});
+router.post('/submit', submitTask);
 
 module.exports = router;

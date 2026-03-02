@@ -45,6 +45,13 @@ const submissionSchema = new mongoose.Schema({
   reviewedAt: {
     type: Date,
   },
-}, { timestamps: true });
+
+}, { aiScore: {
+  type: Number,
+  default: 0,
+},
+aiFeedback: {
+  type: String,
+},timestamps: true });
 
 module.exports = mongoose.model('Submission', submissionSchema);
