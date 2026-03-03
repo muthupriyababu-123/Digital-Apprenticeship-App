@@ -59,8 +59,8 @@ function App() {
           
           {/* STEP 1: Homepage (Redirects to Profile if already logged in) */}
           <Route 
-            path="/student-dashboard" 
-            element={user?.role === 'student' ? <StudentDashboard user={user} setUser={setUser} /> : <Navigate to="/login" />} 
+            path="/" 
+            element={user ? <Navigate to="/profile" /> : <Home />} 
           />
 
           {/* STEP 2: Register (Redirects to Profile if already logged in) */}
