@@ -1,9 +1,9 @@
+<<<<<<< HEAD
 node_modules/
 .env
-.env.local
 build/
-dist/
+=======
+# existing lines from GitHub remote
 .DS_Store
 *.log
-*.swp
-*.swo
+>>>>>>> main
